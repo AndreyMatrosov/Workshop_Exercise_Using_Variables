@@ -1,0 +1,18 @@
+---
+- name: manage apache2.conf
+  hosts: web
+  become: yes
+
+  tasks:
+  - name: Copy Apache configuration file
+    copy:
+      src: apache2.conf
+      dest: /etc/apache2/
+    notify:
+    - restart_apache
+
+  handlers:
+  - name: restart_apache
+    service: 
+      name: apache2.service
+      state: restarted

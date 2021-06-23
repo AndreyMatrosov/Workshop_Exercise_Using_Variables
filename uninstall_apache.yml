@@ -1,0 +1,15 @@
+---
+- name: uninstall_apache
+  hosts: web
+  become: yes
+
+  tasks:
+  - name: uninstall apache
+    apt: 
+      name: apache2
+      state: absent
+  
+  - name: purge
+    apt:
+      name: apache2
+      purge: yes

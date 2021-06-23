@@ -1,12 +1,10 @@
-[all:vars]
-ansible_user=vagrant
-ansible_ssh_pass=vagrant
-ansible_port=22
-
 [control]
 control1 ansible_host=192.168.1.11
 
 [web]
-ubuntu1 ansible_host=192.168.1.21
-ubuntu2 ansible_host=192.168.1.22
-ubuntu3 ansible_host=192.168.1.23
+node1 ansible_host=192.168.1.21
+node2 ansible_host=192.168.1.22
+node3 ansible_host=192.168.1.23
+
+[ftpserver]
+node2 ansible_host=192.168.1.22

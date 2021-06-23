@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install -y ansible
             sudo apt install -y sshpass
-            #export ANSIBLE_HOST_KEY_CHECKING=False
+            export ANSIBLE_HOST_KEY_CHECKING=False
             #ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@192.168.1.
           SHELL
         end

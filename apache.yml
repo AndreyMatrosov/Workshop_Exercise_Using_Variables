@@ -1,8 +1,9 @@
 ---
 - name: Install apache server
-  hosts: webservers
+  hosts: web
   become: yes
   
+  tasks:
   - name: latest apache version installed
     apt:
       name: apache2
