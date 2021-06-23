@@ -1,0 +1,34 @@
+---
+- name: Install apache server
+  hosts: webservers
+  become: yes
+  
+
+  tasks:
+  - name: update cache
+    apt:
+      update_cache: yes
+    
+  - name: latest apache version installed
+    apt:
+      name: apache2
+      state: latest
+
+  - name: check apache2.service state
+    service:
+      name: apache2.service
+      enabled: yes
+      state: started
+
+  - name: copy new start page
+    copy:
+      src: web.html
+      dest: /var/www/html/index.html
+      force: yes
+    notify: restart apache
+      
+  handlers:
+  - name: restart apache
+    service:
+      name: apache2.service
+      state: restarted
