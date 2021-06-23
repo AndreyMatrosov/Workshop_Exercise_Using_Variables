@@ -3,12 +3,6 @@
   hosts: webservers
   become: yes
   
-
-  tasks:
-  - name: update cache
-    apt:
-      update_cache: yes
-    
   - name: latest apache version installed
     apt:
       name: apache2
@@ -20,15 +14,15 @@
       enabled: yes
       state: started
 
-  - name: copy new start page
-    copy:
-      src: web.html
-      dest: /var/www/html/index.html
-      force: yes
-    notify: restart apache
+  # - name: copy new start page
+  #   copy:
+  #     src: web.html
+  #     dest: /var/www/html/index.html
+  #     force: yes
+  #   notify: restart apache
       
-  handlers:
-  - name: restart apache
-    service:
-      name: apache2.service
-      state: restarted
+  # handlers:
+  # - name: restart apache
+  #   service:
+  #     name: apache2.service
+  #     state: restarted
