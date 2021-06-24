@@ -1,0 +1,61 @@
+---
+- name: lvm check, resize, install docker, add to dockek.json, change root user passwd
+  hosts: control
+  become: yes
+
+  tasks:
+  - name: lvm check
+    script: script1.sh {{ ansible_devices['sdb']['size'] }} {{ ansible_devices['dm-0']['size'] }}
+    register: output
+
+  - name: Resize LV to 100% of VG
+    lvol:
+      vg: "{{ vg01 }}"
+      lv: lv01
+      size: 100%VG
+      force: yes
+    when: output.stdout.find('less') != -1
+
+
+  - name: Install packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+    - apt-transport-https
+    - ca-certificates
+    - gnupg-agent
+    - software-properties-common
+
+  - name: add GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      
+  - name: add docker repository to apt
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present  
+
+  - name: Install Docker
+    apt:
+      name: "{{item}}"
+      state: latest
+      update_cache: yes
+      loop:
+      - docker-ce
+      - docker-ce-cli
+      - container.io
+
+  - name: docker started and enabled
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+  handlers:
+    - name: restart docker
+      service: 
+        name: docker 
+        state: restarted
