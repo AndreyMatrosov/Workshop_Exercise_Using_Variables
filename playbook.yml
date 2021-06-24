@@ -1,5 +1,5 @@
 ---
-- name: lvm check, resize, install docker, add to dockek.json, change root user passwd
+- name: lvm check, resize, install docker, add to dockek.json, change root user passwd, disable swap
   hosts: control
   become: yes
 
@@ -10,9 +10,9 @@
 
   - name: Resize LV to 100% of VG
     lvol:
-      vg: "{{ vg01 }}"
+      vg: vg01
       lv: lv01
-      size: 100%VG
+      size: 100%FREE
       force: yes
     when: output.stdout.find('less') != -1
 
@@ -29,24 +29,24 @@
     - software-properties-common
 
   - name: add GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
       
   - name: add docker repository to apt
-      apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu bionic stable
-        state: present  
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present  
 
   - name: Install Docker
     apt:
       name: "{{item}}"
       state: latest
       update_cache: yes
-      loop:
+    loop:
       - docker-ce
       - docker-ce-cli
-      - container.io
+      - containerd.io
 
   - name: docker started and enabled
     service:
@@ -59,3 +59,5 @@
       service: 
         name: docker 
         state: restarted
+
+  - name: disable swap
