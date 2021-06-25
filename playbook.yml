@@ -1,9 +1,3 @@
-# curl https://releases.rancher.com/install-docker/20.10.sh | sh
-# echo '{"log-opts":{"max-size":"10m","max-file":"2"},"registry-mirrors":["http://127.0.0.1:65001","https://mirror.gcr.io"]}' > /etc/docker/daemon.json
-# lvm
-# lvm> lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-# lvm> exit
-# resize2fs /dev/ubuntu-vg/ubuntu-lv - ext2 ext3
 ---
 - name: Multiple changes
   hosts: test4
@@ -62,14 +56,6 @@
       name: docker
       state: started
       enabled: yes
-
-  # - name: Create daemon.json
-  #   file:
-  #     path: "/etc/docker/daemon.json"
-  #     state: touch
-  #     mode: 0644 
-  #     owner: root
-  #     group: root
 
   - name: Modify daemon.json
     copy:
