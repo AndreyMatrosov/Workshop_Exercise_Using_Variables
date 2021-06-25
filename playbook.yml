@@ -6,7 +6,7 @@
 # resize2fs /dev/ubuntu-vg/ubuntu-lv - ext2 ext3
 ---
 - name: Multiple changes
-  hosts: control
+  hosts: test4
   become: yes
 
   tasks:
@@ -17,10 +17,10 @@
   - name: Resize LV to 100% of VG
     lvol:
       vg: vg01 #ubuntu-vg
-      lv: lv01 #ubuntu-lv
-      size: 100%FREE
+      lv: lvol0 #ubuntu-lv
+      size: +100%FREE
       force: yes
-    #when: output.stdout.find('less') != -1
+    when: output.stdout.find('less') != -1
   
   - name: Disable swap permanently
     replace:
