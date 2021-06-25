@@ -1,0 +1,85 @@
+# curl https://releases.rancher.com/install-docker/20.10.sh | sh
+# echo '{"log-opts":{"max-size":"10m","max-file":"2"},"registry-mirrors":["http://127.0.0.1:65001","https://mirror.gcr.io"]}' > /etc/docker/daemon.json
+# lvm
+# lvm> lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+# lvm> exit
+# resize2fs /dev/ubuntu-vg/ubuntu-lv - ext2 ext3
+---
+- name: Multiple changes
+  hosts: test4
+  become: yes
+
+  tasks:
+  - name: Resize LV to 100% of VG
+    lvol:
+      vg: vg01 #ubuntu-vg
+      lv: lvol0 #ubuntu-lv
+      size: +100%FREE
+      force: yes
+    when: ansible_devices['sdb']['size']|human_to_bytes | int != ansible_devices['dm-0']['size']|human_to_bytes | int
+  
+  - name: Disable swap permanently
+    replace:
+      path: /etc/fstab
+      regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+      replace: '#\1\2\3swap\4'
+      backup: yes
+      
+  - name: Install Docker packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+      cache_valid_time: 3600
+    loop:
+    - apt-transport-https
+    - ca-certificates
+    - gnupg-agent
+    - software-properties-common
+
+  - name: Add GPG key for Docker
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+      
+  - name: Add docker repository to apt
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present  
+
+  - name: Install Docker
+    apt:
+      name: "{{item}}"
+      state: latest
+      update_cache: yes
+    loop:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+  - name: Start and enable docker
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+  # - name: Create daemon.json
+  #   file:
+  #     path: "/etc/docker/daemon.json"
+  #     state: touch
+  #     mode: 0644 
+  #     owner: root
+  #     group: root
+
+  - name: Modify daemon.json
+    copy:
+      dest: "/etc/docker/daemon.json"
+      src: daemon.json
+      backup: yes
+    notify: restart docker
+
+  handlers:
+  - name: restart docker
+    service: 
+      name: docker 
+      state: restarted 
