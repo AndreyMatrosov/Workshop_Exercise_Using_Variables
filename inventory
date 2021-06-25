@@ -6,9 +6,19 @@ control1 ansible_host=192.168.1.11
 node1 ansible_host=192.168.1.21 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 node2 ansible_host=192.168.1.22 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 node3 ansible_host=192.168.1.23 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+node4 ansible_host=192.168.1.24 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [ftpserver]
 node2 ansible_host=192.168.1.22
 
-[test]
+[test1]
 node1 ansoble_host=192.168.1.21
+
+[test2]
+node1 ansoble_host=192.168.1.22
+
+[test3]
+node1 ansoble_host=192.168.1.23
+
+[test4]
+node1 ansoble_host=192.168.1.24

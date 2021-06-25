@@ -1,4 +1,4 @@
-$ubuntu_mach = 1
+$ubuntu_mach = 4
 $control_mach = 1
 
 Vagrant.configure("2") do |config|

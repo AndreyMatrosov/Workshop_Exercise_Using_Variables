@@ -5,12 +5,12 @@
 # lvm> exit
 # resize2fs /dev/ubuntu-vg/ubuntu-lv - ext2 ext3
 ---
-- name: lvm check, resize, install docker, add to dockek.json, change root user passwd, disable swap
+- name: Multiple changes
   hosts: control
   become: yes
 
   tasks:
-  - name: lvm check
+  - name: Check and compare LV size
     script: script1.sh {{ ansible_devices['sdb']['size'] }} {{ ansible_devices['dm-0']['size'] }}
     register: output
 
@@ -20,16 +20,16 @@
       lv: lv01 #ubuntu-lv
       size: 100%FREE
       force: yes
-    when: output.stdout.find('less') != -1
+    #when: output.stdout.find('less') != -1
   
-  - name: disable swap
+  - name: Disable swap permanently
     replace:
       path: /etc/fstab
       regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
       replace: '#\1\2\3swap\4'
       backup: yes
       
-  - name: Install packages
+  - name: Install Docker packages
     apt:
       name: "{{ item }}"
       state: present
@@ -41,12 +41,12 @@
     - gnupg-agent
     - software-properties-common
 
-  - name: add GPG key
+  - name: Add GPG key for Docker
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
       
-  - name: add docker repository to apt
+  - name: Add docker repository to apt
     apt_repository:
       repo: deb https://download.docker.com/linux/ubuntu bionic stable
       state: present  
@@ -61,13 +61,13 @@
       - docker-ce-cli
       - containerd.io
 
-  - name: docker started and enabled
+  - name: Start and enable docker
     service:
       name: docker
       state: started
       enabled: yes
 
-  - name: create daemon.json
+  - name: Create daemon.json
     file:
       path: "/etc/docker/daemon.json"
       state: touch
@@ -75,7 +75,7 @@
       owner: root
       group: root
 
-  - name: modify daemon.json
+  - name: Modify daemon.json
     copy:
       dest: "/etc/docker/daemon.json"
       src: daemon.json
