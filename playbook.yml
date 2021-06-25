@@ -10,17 +10,14 @@
   become: yes
 
   tasks:
-  - name: Check and compare LV size
-    script: script1.sh {{ ansible_devices['sdb']['size'] }} {{ ansible_devices['dm-0']['size'] }}
-    register: output
-
+  
   - name: Resize LV to 100% of VG
     lvol:
       vg: vg01 #ubuntu-vg
       lv: lvol0 #ubuntu-lv
       size: +100%FREE
       force: yes
-    when: output.stdout.find('less') != -1
+    when: ansible_devices['sdb']['size']|human_to_bytes | int == ansible_devices['dm-0']['size']|human_to_bytes | int
   
   - name: Disable swap permanently
     replace:

@@ -5,5 +5,5 @@ lvm_size=$3
 #|human_to_bytes
 
 if (( $(echo "$lvm_size != $disk_size" |bc -l) )); then
-  echo "less"
+  echo "flag"
 fi 

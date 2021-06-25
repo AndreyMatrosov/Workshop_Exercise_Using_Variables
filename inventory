@@ -15,10 +15,10 @@ node2 ansible_host=192.168.1.22
 node1 ansoble_host=192.168.1.21
 
 [test2]
-node1 ansoble_host=192.168.1.22
+node2 ansoble_host=192.168.1.22
 
 [test3]
-node1 ansoble_host=192.168.1.23
+node3 ansoble_host=192.168.1.23
 
 [test4]
-node1 ansoble_host=192.168.1.24
+node4 ansoble_host=192.168.1.24
