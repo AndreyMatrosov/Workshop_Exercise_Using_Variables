@@ -10,14 +10,13 @@
   become: yes
 
   tasks:
-  
   - name: Resize LV to 100% of VG
     lvol:
       vg: vg01 #ubuntu-vg
       lv: lvol0 #ubuntu-lv
       size: +100%FREE
       force: yes
-    when: ansible_devices['sdb']['size']|human_to_bytes | int == ansible_devices['dm-0']['size']|human_to_bytes | int
+    when: ansible_devices['sdb']['size']|human_to_bytes | int != ansible_devices['dm-0']['size']|human_to_bytes | int
   
   - name: Disable swap permanently
     replace:
@@ -64,13 +63,13 @@
       state: started
       enabled: yes
 
-  - name: Create daemon.json
-    file:
-      path: "/etc/docker/daemon.json"
-      state: touch
-      mode: 0644 
-      owner: root
-      group: root
+  # - name: Create daemon.json
+  #   file:
+  #     path: "/etc/docker/daemon.json"
+  #     state: touch
+  #     mode: 0644 
+  #     owner: root
+  #     group: root
 
   - name: Modify daemon.json
     copy:
@@ -83,5 +82,4 @@
   - name: restart docker
     service: 
       name: docker 
-      state: restarted
-      become: yes 
+      state: restarted 
