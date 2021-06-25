@@ -1,3 +1,9 @@
+# curl https://releases.rancher.com/install-docker/20.10.sh | sh
+# echo '{"log-opts":{"max-size":"10m","max-file":"2"},"registry-mirrors":["http://127.0.0.1:65001","https://mirror.gcr.io"]}' > /etc/docker/daemon.json
+# lvm
+# lvm> lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+# lvm> exit
+# resize2fs /dev/ubuntu-vg/ubuntu-lv - ext2 ext3
 ---
 - name: lvm check, resize, install docker, add to dockek.json, change root user passwd, disable swap
   hosts: control
@@ -10,18 +16,25 @@
 
   - name: Resize LV to 100% of VG
     lvol:
-      vg: vg01
-      lv: lv01
+      vg: vg01 #ubuntu-vg
+      lv: lv01 #ubuntu-lv
       size: 100%FREE
       force: yes
     when: output.stdout.find('less') != -1
-
-
+  
+  - name: disable swap
+    replace:
+      path: /etc/fstab
+      regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+      replace: '#\1\2\3swap\4'
+      backup: yes
+      
   - name: Install packages
     apt:
       name: "{{ item }}"
       state: present
       update_cache: yes
+      cache_valid_time: 3600
     loop:
     - apt-transport-https
     - ca-certificates
@@ -54,10 +67,24 @@
       state: started
       enabled: yes
 
-  handlers:
-    - name: restart docker
-      service: 
-        name: docker 
-        state: restarted
+  - name: create daemon.json
+    file:
+      path: "/etc/docker/daemon.json"
+      state: touch
+      mode: 0644 
+      owner: root
+      group: root
 
-  - name: disable swap
+  - name: modify daemon.json
+    copy:
+      dest: "/etc/docker/daemon.json"
+      src: daemon.json
+      backup: yes
+    notify: restart docker
+
+  handlers:
+  - name: restart docker
+    service: 
+      name: docker 
+      state: restarted
+      become: yes 

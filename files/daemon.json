@@ -1,0 +1,4 @@
+{
+"log-opts": {"max-size":"10m","max-file":"2"},
+"registry-mirrors": ["http://127.0.0.1:65001","https://mirror.gcr.io"]
+}
